@@ -103,25 +103,28 @@ terminus org:list
 
 Show the output to the user and ask which org the site should be created under. Wait for their selection before continuing.
 
-### Step 6 — Create the Pantheon site
+### Step 6 — Create the Pantheon site and set secrets
 
-Using the upstream machine name `nextjs-16` (UUID: `f9c1a10c-bd05-448f-9c0d-b73839e69e58`) and the org UUID selected in step 5:
+Using the upstream machine name `nextjs-16` (UUID: `f9c1a10c-bd05-448f-9c0d-b73839e69e58`) and the org UUID selected in step 5.
 
+Since `PCC_SITE_ID` and `PCC_TOKEN` are already known from step 0, run site creation in the background and set secrets the moment the site ID exists — before the workflow's GitHub connection triggers the first build. This ensures the first build succeeds without needing a retry.
+
+Run site creation in the background:
 ```bash
 terminus site:create $SITE_NAME "$SITE_NAME" nextjs-16 \
   --org=$PANTHEON_ORG \
   --vcs-provider=github \
   --vcs-org=$GITHUB_ORG \
   --repository-name=$SITE_NAME \
-  --no-create-repo
+  --no-create-repo &
 ```
 
-### Step 7 — Set Content Publisher secrets
+Poll until the site responds to Terminus (the site ID is assigned within seconds, well before the workflow completes):
+```bash
+until terminus site:info $SITE_NAME &>/dev/null; do sleep 3; done
+```
 
-**Set secrets before triggering a build** — the build will fail without them.
-
-Ask the user for their `PCC_SITE_ID` and `PCC_TOKEN` if not already collected in step 0, then:
-
+Immediately set secrets:
 ```bash
 terminus secret:site:set $SITE_NAME PCC_SITE_ID "$PCC_SITE_ID" --type=env --scope=web
 terminus secret:site:set $SITE_NAME PCC_TOKEN "$PCC_TOKEN" --type=env --scope=web
@@ -138,16 +141,10 @@ terminus secret:site:delete $SITE_NAME PCC_TOKEN --yes
 
 Do not use `--rebuild` with `secret:site:set` — it triggers a PHP fatal error in the current Terminus version.
 
-### Step 8 — Trigger and verify the build
+### Step 7 — Verify the build
 
-Since the GitHub repo was pushed before the Pantheon site existed, trigger the first build with an empty commit:
+The site creation workflow connects the GitHub repo and triggers the first build automatically. Watch it:
 
-```bash
-git commit --allow-empty -m "chore: trigger initial Pantheon build"
-git push
-```
-
-Watch the build:
 ```bash
 terminus node:builds:wait $SITE_NAME.dev
 ```
