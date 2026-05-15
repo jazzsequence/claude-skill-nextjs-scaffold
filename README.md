@@ -68,5 +68,5 @@ You'll also need a [Content Publisher collection](https://content.pantheon.io) w
 | `skills/scaffold-cpub-nextjs/SKILL.md` | The skill definition — imperative instructions Claude follows when the skill is invoked |
 | `.claude-plugin/marketplace.json` | Marketplace manifest — registers this repo as a Claude Code plugin source |
 | `.claude-plugin/plugin.json` | Plugin manifest — name, version, author metadata |
-| `skill.md` | Canonical copy of the skill (kept at root for reference) |
+| `install.sh` | Installer script — merges plugin config into `~/.claude/settings.json` |
 | `CLAUDE.md` | Guidance for Claude Code when working on this skill repo itself |
