@@ -16,24 +16,26 @@ Invoking this skill walks Claude through:
 
 ## Installation
 
-Copy `skill.md` into your Claude Code skills directory and register it:
-
-```bash
-mkdir -p ~/.claude/skills/scaffold-cpub-nextjs
-cp skill.md ~/.claude/skills/scaffold-cpub-nextjs/skill.md
-```
-
-Then add it to your Claude Code settings (`~/.claude/settings.json`):
+Add this repo as a marketplace in your `~/.claude/settings.json`:
 
 ```json
 {
-  "skills": {
-    "scaffold-cpub-nextjs": {
-      "path": "~/.claude/skills/scaffold-cpub-nextjs/skill.md"
+  "extraKnownMarketplaces": {
+    "claude-skill-nextjs-scaffold": {
+      "source": {
+        "source": "github",
+        "repo": "jazzsequence/claude-skill-nextjs-scaffold"
+      },
+      "autoUpdate": true
     }
+  },
+  "enabledPlugins": {
+    "scaffold-cpub-nextjs@claude-skill-nextjs-scaffold": true
   }
 }
 ```
+
+Claude Code will fetch the skill from GitHub and keep it up to date automatically.
 
 ## Usage
 
@@ -67,5 +69,8 @@ You'll also need a [Content Publisher collection](https://content.pantheon.io) w
 
 | File | Purpose |
 |---|---|
-| `skill.md` | The skill definition — imperative instructions Claude follows when the skill is invoked |
+| `skills/scaffold-cpub-nextjs/SKILL.md` | The skill definition — imperative instructions Claude follows when the skill is invoked |
+| `.claude-plugin/marketplace.json` | Marketplace manifest — registers this repo as a Claude Code plugin source |
+| `.claude-plugin/plugin.json` | Plugin manifest — name, version, author metadata |
+| `skill.md` | Canonical copy of the skill (kept at root for reference) |
 | `CLAUDE.md` | Guidance for Claude Code when working on this skill repo itself |
