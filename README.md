@@ -16,26 +16,22 @@ Invoking this skill walks Claude through:
 
 ## Installation
 
-Add this repo as a marketplace in your `~/.claude/settings.json`:
+Run the installer script — it merges the required config into your `~/.claude/settings.json` without touching anything else:
 
-```json
-{
-  "extraKnownMarketplaces": {
-    "claude-skill-nextjs-scaffold": {
-      "source": {
-        "source": "github",
-        "repo": "jazzsequence/claude-skill-nextjs-scaffold"
-      },
-      "autoUpdate": true
-    }
-  },
-  "enabledPlugins": {
-    "scaffold-cpub-nextjs@claude-skill-nextjs-scaffold": true
-  }
-}
+```bash
+curl -fsSL https://raw.githubusercontent.com/jazzsequence/claude-skill-nextjs-scaffold/main/install.sh | bash
 ```
 
-Claude Code will fetch the skill from GitHub and keep it up to date automatically.
+Or clone the repo and run it locally:
+
+```bash
+git clone https://github.com/jazzsequence/claude-skill-nextjs-scaffold.git
+bash claude-skill-nextjs-scaffold/install.sh
+```
+
+Requires Node.js (already installed if you're working with Next.js). Claude Code will fetch the skill from GitHub and keep it up to date automatically.
+
+Start a new Claude Code session after installing to use `/scaffold-cpub-nextjs`.
 
 ## Usage
 
