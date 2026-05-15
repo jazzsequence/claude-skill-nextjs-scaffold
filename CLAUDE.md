@@ -12,12 +12,23 @@ A Next.js 16 + TypeScript site scaffolded from the [Pantheon Content Publisher s
 
 Use this workflow to create a new Content Publisher + Next.js site on Pantheon. Replace `$SITE_NAME` with a lowercase, hyphens-only machine name and `$GITHUB_ORG` with a GitHub org or username.
 
+### 0. Create a Content Publisher collection
+
+**This must exist before you begin.** The build will fail with "Missing Pantheon Content Publisher site ID" if secrets are not set, and secrets cannot be set without a collection.
+
+1. Go to [content.pantheon.io](https://content.pantheon.io) and sign in
+2. Navigate to **Collections** → **+ New collection**, select a Google account, set publishing permissions
+3. Copy the **Collection ID** (`PCC_SITE_ID`) from the collection page
+4. Navigate to **Tokens** (separate section in the left nav) → create a new token → copy it immediately (`PCC_TOKEN`) — tokens are only shown once
+
+Ask the user to confirm they have both values before proceeding.
+
 ### 1. Verify prerequisites
 
 ```bash
-cpub whoami          # Content Publisher CLI
-terminus auth:whoami # Terminus
-gh auth status       # GitHub CLI
+cpub whoami          # Content Publisher CLI — run `cpub login` if not authed (opens browser OAuth)
+terminus auth:whoami # Terminus — run `terminus auth:login` if not authed
+gh auth status       # GitHub CLI — run `gh auth login` if not authed
 ```
 
 Install anything missing before continuing (see Prerequisites section below).
@@ -62,32 +73,64 @@ Confirm: `gh repo view $SITE_NAME --json url -q .url`
 
 ### 5. Create the Pantheon site
 
+The Next.js 16 upstream machine name is `nextjs-16` (UUID: `f9c1a10c-bd05-448f-9c0d-b73839e69e58`). If the GitHub repo already exists (from step 4), pass `--no-create-repo` and `--repository-name` to connect to it rather than creating a new one:
+
 ```bash
-terminus site:create $SITE_NAME "$SITE_NAME" --framework=nextjs
+# GitHub repo already exists — connect to it:
+terminus site:create $SITE_NAME "$SITE_NAME" nextjs-16 \
+  --org=$PANTHEON_ORG \
+  --vcs-provider=github \
+  --vcs-org=$GITHUB_ORG \
+  --repository-name=$SITE_NAME \
+  --no-create-repo
+
+# Or let Terminus create the GitHub repo (omit --no-create-repo and --repository-name):
+terminus site:create $SITE_NAME "$SITE_NAME" nextjs-16 \
+  --org=$PANTHEON_ORG \
+  --vcs-provider=github \
+  --vcs-org=$GITHUB_ORG
 ```
 
-Then connect the GitHub repo via the **Pantheon Dashboard > Settings > Source Code**. CLI-based GitHub connection is not supported via Terminus. The dashboard connection triggers the first build automatically.
+`--org` is required when using `--vcs-provider=github`. Find your org UUID with `terminus org:list`.
 
 ### 6. Set Content Publisher secrets
+
+**Do this before triggering a build.** The build will fail with "Missing Pantheon Content Publisher site ID" if secrets are not set first.
 
 Obtain `PCC_SITE_ID` and `PCC_TOKEN` from [content.pantheon.io](https://content.pantheon.io), then:
 
 ```bash
-terminus secret:site:set $SITE_NAME PCC_SITE_ID "your-collection-id" --scope=ic
-terminus secret:site:set $SITE_NAME PCC_TOKEN "your-token" --scope=ic
+terminus secret:site:set $SITE_NAME PCC_SITE_ID "your-collection-id" --type=env --scope=web
+terminus secret:site:set $SITE_NAME PCC_TOKEN "your-token" --type=env --scope=web
 ```
 
-`--scope=ic` makes secrets available at image compile (build) time, which Content Publisher requires.
+`--type=env --scope=web` is required. `env` makes them available as real `process.env.*` variables (not just readable via `pantheonGetSecret()`). `web` makes them available during both builds and runtime. Using `--scope=ic` (Integrated Composer) or `--type=runtime` will not work — the build will still fail.
 
-### 7. Verify the build
+Note: secrets cannot have their type or scope changed after creation. Delete and recreate if you set them incorrectly:
 
 ```bash
-terminus build:log $SITE_NAME.dev
-# or, if the Node Logs plugin is installed:
-terminus node-log:stream $SITE_NAME.dev
+terminus secret:site:delete $SITE_NAME PCC_SITE_ID --yes
+terminus secret:site:delete $SITE_NAME PCC_TOKEN --yes
 ```
 
-The dev environment will be live at `https://dev-$SITE_NAME.pantheonsite.io`.
+**Do not use `--rebuild`** with `secret:site:set` — it triggers a PHP fatal error in the current Terminus version. Trigger rebuilds manually with an empty git commit (see step 7).
+
+### 7. Trigger and verify the build
+
+The Pantheon site only builds when a commit is pushed to the connected GitHub repo. If the repo was pushed before the Pantheon site was created, push a new commit to trigger the first build:
+
+```bash
+git commit --allow-empty -m "chore: trigger initial Pantheon build"
+git push
+```
+
+Then watch the build:
+
+```bash
+terminus node:builds:wait $SITE_NAME.dev
+```
+
+The dev environment will be live at `https://dev-$SITE_NAME.pantheonsite.io` once the build succeeds.
 
 ---
 
@@ -124,14 +167,14 @@ PCC_SITE_ID=   # collection ID from content.pantheon.io
 PCC_TOKEN=     # token from content.pantheon.io
 ```
 
-On Pantheon, these are set as secrets (not env vars) so they're available at build time:
+On Pantheon, these are set as secrets available at both build and runtime:
 
 ```bash
-terminus secret:site:set $SITE_NAME PCC_SITE_ID "..." --scope=ic
-terminus secret:site:set $SITE_NAME PCC_TOKEN "..."   --scope=ic
+terminus secret:site:set $SITE_NAME PCC_SITE_ID "..." --type=env --scope=web
+terminus secret:site:set $SITE_NAME PCC_TOKEN "..."   --type=env --scope=web
 ```
 
-The `--scope=ic` flag is required — it makes secrets available at image compile (build) time.
+See step 6 in the scaffold workflow for details on why `--type=env --scope=web` is required.
 
 ## Architecture
 
@@ -147,9 +190,7 @@ The `--scope=ic` flag is required — it makes secrets available at image compil
 
 ## Pantheon deployment
 
-The Pantheon site is connected to this GitHub repo via the Pantheon Dashboard (**Settings > Source Code**). Pushing to `main` triggers a build automatically. The dev environment URL is `https://dev-{site-name}.pantheonsite.io`.
-
-GitHub connection cannot be configured via Terminus — use the dashboard UI.
+The Pantheon site is connected to this GitHub repo via `--vcs-provider=github` at site creation time (see scaffold steps above). Pushing to `main` triggers a build automatically. The dev environment URL is `https://dev-{site-name}.pantheonsite.io`.
 
 ## Key references
 
