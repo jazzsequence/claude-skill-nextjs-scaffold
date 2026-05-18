@@ -49,5 +49,5 @@ fi
 
 echo -e "${GREEN}✓${NC} Plugin installed: $PLUGIN_KEY"
 echo ""
-echo "Start a new Claude Code session to use /scaffold-cpub-nextjs"
+echo "Start a new Claude Code session to use /jazzsequence-skills:scaffold-cpub-nextjs"
 echo "To update later: claude plugin update $PLUGIN_KEY"

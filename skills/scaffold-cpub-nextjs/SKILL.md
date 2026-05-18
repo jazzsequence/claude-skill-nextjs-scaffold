@@ -5,7 +5,7 @@ Use this skill to scaffold a new Next.js site from the Pantheon Content Publishe
 ## Usage
 
 ```
-/scaffold-cpub-nextjs <site-name> [github-org]
+/jazzsequence-skills:scaffold-cpub-nextjs <site-name> [github-org]
 ```
 
 - `site-name` — machine name for the GitHub repo and Pantheon site (lowercase, hyphens only)
