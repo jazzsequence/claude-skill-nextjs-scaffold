@@ -73,4 +73,4 @@ claude plugin install "$PLUGIN_KEY" 2>&1
 
 echo ""
 echo "Start a new Claude Code session to use /scaffold-cpub-nextjs"
-echo "To update later: claude plugin update scaffold-cpub-nextjs"
+echo "To update later: claude plugin update scaffold-cpub-nextjs@claude-skill-nextjs-scaffold"

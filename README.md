@@ -40,7 +40,7 @@ With `autoUpdate: true` set, Claude Code pulls the latest version from GitHub au
 To manually update mid-session:
 
 ```bash
-claude plugin update scaffold-cpub-nextjs
+claude plugin update scaffold-cpub-nextjs@claude-skill-nextjs-scaffold
 ```
 
 Then start a new Claude Code session to apply the update. To check what version is currently installed:
