@@ -20,6 +20,13 @@ if ! command -v node &>/dev/null; then
   exit 1
 fi
 
+# claude CLI is required to formally install the plugin
+if ! command -v claude &>/dev/null; then
+  echo -e "${RED}Error:${NC} Claude Code CLI is required but not installed."
+  echo "Install it from https://claude.ai/code"
+  exit 1
+fi
+
 # Ensure ~/.claude exists
 mkdir -p "$HOME/.claude"
 
@@ -28,10 +35,10 @@ if [ ! -f "$SETTINGS" ]; then
   echo "{}" > "$SETTINGS"
 fi
 
-# Use Node to merge settings without clobbering existing config
-node - "$SETTINGS" "$MARKETPLACE_KEY" "$PLUGIN_KEY" <<'EOF'
+# Step 1: Register the marketplace in settings.json via Node
+node - "$SETTINGS" "$MARKETPLACE_KEY" <<'EOF'
 const fs = require('fs');
-const [,, settingsPath, marketplaceKey, pluginKey] = process.argv;
+const [,, settingsPath, marketplaceKey] = process.argv;
 
 let settings = {};
 try {
@@ -41,9 +48,9 @@ try {
   process.exit(1);
 }
 
-const alreadyInstalled = settings.extraKnownMarketplaces?.[marketplaceKey];
-if (alreadyInstalled) {
-  console.log('\x1b[33mAlready installed.\x1b[0m Updating marketplace entry...');
+const alreadyRegistered = settings.extraKnownMarketplaces?.[marketplaceKey];
+if (alreadyRegistered) {
+  console.log('\x1b[33mMarketplace already registered.\x1b[0m Updating entry...');
 }
 
 settings.extraKnownMarketplaces = settings.extraKnownMarketplaces || {};
@@ -55,13 +62,15 @@ settings.extraKnownMarketplaces[marketplaceKey] = {
   autoUpdate: true,
 };
 
-settings.enabledPlugins = settings.enabledPlugins || {};
-settings.enabledPlugins[pluginKey] = true;
-
 fs.writeFileSync(settingsPath, JSON.stringify(settings, null, 2) + '\n');
 EOF
 
 echo -e "${GREEN}✓${NC} Marketplace registered: $MARKETPLACE_KEY"
-echo -e "${GREEN}✓${NC} Plugin enabled: $PLUGIN_KEY"
+
+# Step 2: Install the plugin via the Claude CLI so it's tracked and updatable
+echo "Installing plugin..."
+claude plugin install "$PLUGIN_KEY" 2>&1
+
 echo ""
 echo "Start a new Claude Code session to use /scaffold-cpub-nextjs"
+echo "To update later: claude plugin update scaffold-cpub-nextjs"
