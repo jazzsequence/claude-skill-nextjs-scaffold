@@ -34,3 +34,9 @@ Use semantic versioning:
 - `patch` (e.g. `2.0.0` → `2.0.1`) — bug fixes, wording corrections, minor additions
 - `minor` (e.g. `2.0.0` → `2.1.0`) — new skill steps, new features
 - `major` (e.g. `2.0.0` → `3.0.0`) — breaking changes to the workflow or interface
+
+After bumping the version and pushing, create and push the release tag:
+```bash
+claude plugin tag
+git push origin refs/tags/jazzsequence-skills--v<version>
+```
