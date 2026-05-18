@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-MARKETPLACE_KEY="claude-skill-nextjs-scaffold"
-PLUGIN_KEY="scaffold-cpub-nextjs@claude-skill-nextjs-scaffold"
+MARKETPLACE_KEY="cpub-nextjs-scaffold"
+PLUGIN_KEY="jazzsequence-skills@cpub-nextjs-scaffold"
 SETTINGS="$HOME/.claude/settings.json"
 
 GREEN='\033[0;32m'
@@ -73,4 +73,4 @@ claude plugin install "$PLUGIN_KEY" 2>&1
 
 echo ""
 echo "Start a new Claude Code session to use /scaffold-cpub-nextjs"
-echo "To update later: claude plugin update scaffold-cpub-nextjs@claude-skill-nextjs-scaffold"
+echo "To update later: claude plugin update jazzsequence-skills@cpub-nextjs-scaffold"

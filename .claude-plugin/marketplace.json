@@ -1,15 +1,15 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
-  "name": "claude-skill-nextjs-scaffold",
+  "name": "cpub-nextjs-scaffold",
   "version": "1.0.0",
-  "description": "Claude Code skill to scaffold a Pantheon Content Publisher + Next.js site end to end",
+  "description": "Claude Code skills by Chris Reynolds",
   "owner": {
     "name": "Chris Reynolds",
     "url": "https://github.com/jazzsequence"
   },
   "plugins": [
     {
-      "name": "scaffold-cpub-nextjs",
+      "name": "jazzsequence-skills",
       "description": "Scaffold a Pantheon Content Publisher + Next.js site: codebase, GitHub repo, Pantheon site, secrets, and first build in a single command",
       "source": "./",
       "category": "development"

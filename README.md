@@ -19,14 +19,14 @@ Invoking this skill walks Claude through:
 Run the installer script — it merges the required config into your `~/.claude/settings.json` without touching anything else:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/jazzsequence/claude-skill-nextjs-scaffold/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/jazzsequence/cpub-nextjs-scaffold/main/install.sh | bash
 ```
 
 Or clone the repo and run it locally:
 
 ```bash
-git clone https://github.com/jazzsequence/claude-skill-nextjs-scaffold.git
-bash claude-skill-nextjs-scaffold/install.sh
+git clone https://github.com/jazzsequence/cpub-nextjs-scaffold.git
+bash cpub-nextjs-scaffold/install.sh
 ```
 
 Requires Node.js (already installed if you're working with Next.js). Claude Code will fetch the skill from GitHub and keep it up to date automatically.
@@ -40,7 +40,7 @@ With `autoUpdate: true` set, Claude Code pulls the latest version from GitHub au
 To manually update mid-session:
 
 ```bash
-claude plugin update scaffold-cpub-nextjs@claude-skill-nextjs-scaffold
+claude plugin update jazzsequence-skills@cpub-nextjs-scaffold
 ```
 
 Then start a new Claude Code session to apply the update. To check what version is currently installed:

@@ -1,7 +1,7 @@
 {
-  "name": "scaffold-cpub-nextjs",
+  "name": "jazzsequence-skills",
   "version": "1.0.0",
-  "description": "Claude Code skill to scaffold a Pantheon Content Publisher + Next.js site end to end",
+  "description": "Claude Code skills by Chris Reynolds",
   "author": {
     "name": "Chris Reynolds",
     "url": "https://github.com/jazzsequence"
