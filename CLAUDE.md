@@ -25,3 +25,12 @@ When editing `skills/scaffold-cpub-nextjs/SKILL.md`:
 
 When editing `README.md`:
 - Installation is via `install.sh` — update that script if the plugin registration mechanism changes, then update the README to match
+
+## Versioning
+
+**Always bump the version in both `.claude-plugin/marketplace.json` and `.claude-plugin/plugin.json` when making changes to the skill.** The plugin system compares version numbers to determine if an update is available — if the version never changes, `claude plugin update` will always report "already at the latest version" even when the skill content has changed.
+
+Use semantic versioning:
+- `patch` (e.g. `2.0.0` → `2.0.1`) — bug fixes, wording corrections, minor additions
+- `minor` (e.g. `2.0.0` → `2.1.0`) — new skill steps, new features
+- `major` (e.g. `2.0.0` → `3.0.0`) — breaking changes to the workflow or interface
