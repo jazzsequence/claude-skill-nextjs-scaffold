@@ -122,9 +122,13 @@ terminus site:create $SITE_NAME "$SITE_NAME" nextjs-16 \
 ```
 
 ```bash
-# Step 2: poll until site exists, then set secrets immediately
-until terminus site:info $SITE_NAME &>/dev/null; do sleep 3; done
-terminus secret:site:set $SITE_NAME PCC_SITE_ID "$PCC_SITE_ID" --type=env --scope=web
+# Step 2: poll until secrets can be set
+# terminus site:info responds early but the dev environment isn't ready yet
+# — keep retrying secret:site:set until it succeeds
+until terminus secret:site:set $SITE_NAME PCC_SITE_ID "$PCC_SITE_ID" --type=env --scope=web 2>/dev/null; do
+  echo "Waiting for site to be ready for secrets..."
+  sleep 10
+done
 terminus secret:site:set $SITE_NAME PCC_TOKEN "$PCC_TOKEN" --type=env --scope=web
 ```
 
