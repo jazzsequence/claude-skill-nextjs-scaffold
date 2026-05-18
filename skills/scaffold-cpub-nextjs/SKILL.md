@@ -1,3 +1,7 @@
+---
+description: Scaffold a Pantheon Content Publisher + Next.js site end to end — codebase, GitHub repo, Pantheon site, secrets, and first build in a single command.
+---
+
 # Scaffold a Content Publisher + Next.js Site on Pantheon
 
 Use this skill to scaffold a new Next.js site from the Pantheon Content Publisher starter, push it to GitHub, and wire it to a new Pantheon site — end to end.
