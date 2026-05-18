@@ -33,6 +33,22 @@ Requires Node.js (already installed if you're working with Next.js). Claude Code
 
 Start a new Claude Code session after installing to use `/scaffold-cpub-nextjs`.
 
+## Updating
+
+With `autoUpdate: true` set, Claude Code pulls the latest version from GitHub automatically at session start.
+
+To manually update mid-session:
+
+```bash
+claude plugin update scaffold-cpub-nextjs
+```
+
+Then start a new Claude Code session to apply the update. To check what version is currently installed:
+
+```bash
+claude plugin list
+```
+
 ## Usage
 
 ```
