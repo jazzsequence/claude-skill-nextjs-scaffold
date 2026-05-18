@@ -165,6 +165,42 @@ https://dev-$SITE_NAME.pantheonsite.io
 
 ---
 
+## Teardown
+
+To fully destroy a scaffolded site, confirm with the user which of the three components to remove (Pantheon site, GitHub repo, local directory) before deleting anything — each is independently destructive and irreversible.
+
+### Delete the Pantheon site
+
+```bash
+terminus site:delete $SITE_NAME --yes
+```
+
+### Delete the GitHub repo
+
+```bash
+gh repo delete $GITHUB_ORG/$SITE_NAME --yes
+```
+
+### Delete the local directory
+
+```bash
+rm -rf /path/to/$SITE_NAME
+```
+
+### Full teardown (all three)
+
+Confirm with the user before running. Show them exactly what will be deleted and wait for explicit approval.
+
+```bash
+terminus site:delete $SITE_NAME --yes
+gh repo delete $GITHUB_ORG/$SITE_NAME --yes
+rm -rf /path/to/$SITE_NAME
+```
+
+Note: deleting the Pantheon site does not affect the GitHub repo, and vice versa. The Content Publisher collection at content.pantheon.io is not deleted — manage that separately if needed.
+
+---
+
 ## Key references
 
 - [Content Publisher docs](https://docs.content.pantheon.io)
