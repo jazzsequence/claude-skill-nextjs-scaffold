@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+GITHUB_REPO="jazzsequence/claude-skill-nextjs-scaffold"
 MARKETPLACE_KEY="cpub-nextjs-scaffold"
 PLUGIN_KEY="jazzsequence-skills@cpub-nextjs-scaffold"
-SETTINGS="$HOME/.claude/settings.json"
 
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
@@ -13,6 +13,13 @@ NC='\033[0m'
 echo "Installing Claude Skill: Next.js Scaffold..."
 echo ""
 
+# claude CLI is required to install the plugin
+if ! command -v claude &>/dev/null; then
+  echo -e "${RED}Error:${NC} Claude Code CLI is required but not installed."
+  echo "Install it from https://claude.ai/code"
+  exit 1
+fi
+
 # Node.js is guaranteed for this skill's target audience (Next.js developers)
 if ! command -v node &>/dev/null; then
   echo -e "${RED}Error:${NC} Node.js is required but not installed."
@@ -20,57 +27,27 @@ if ! command -v node &>/dev/null; then
   exit 1
 fi
 
-# claude CLI is required to formally install the plugin
-if ! command -v claude &>/dev/null; then
-  echo -e "${RED}Error:${NC} Claude Code CLI is required but not installed."
-  echo "Install it from https://claude.ai/code"
-  exit 1
+# Step 1: Add the marketplace via the Claude CLI (fetches and caches the manifest)
+if claude plugin marketplace list 2>/dev/null | grep -q "$MARKETPLACE_KEY"; then
+  echo -e "${YELLOW}Marketplace already registered.${NC} Updating..."
+  claude plugin marketplace update "$MARKETPLACE_KEY" 2>&1
+else
+  echo "Registering marketplace..."
+  claude plugin marketplace add "$GITHUB_REPO" 2>&1
 fi
-
-# Ensure ~/.claude exists
-mkdir -p "$HOME/.claude"
-
-# Create settings.json if it doesn't exist
-if [ ! -f "$SETTINGS" ]; then
-  echo "{}" > "$SETTINGS"
-fi
-
-# Step 1: Register the marketplace in settings.json via Node
-node - "$SETTINGS" "$MARKETPLACE_KEY" <<'EOF'
-const fs = require('fs');
-const [,, settingsPath, marketplaceKey] = process.argv;
-
-let settings = {};
-try {
-  settings = JSON.parse(fs.readFileSync(settingsPath, 'utf8'));
-} catch (e) {
-  console.error('Error: settings.json contains invalid JSON. Please fix it before installing.');
-  process.exit(1);
-}
-
-const alreadyRegistered = settings.extraKnownMarketplaces?.[marketplaceKey];
-if (alreadyRegistered) {
-  console.log('\x1b[33mMarketplace already registered.\x1b[0m Updating entry...');
-}
-
-settings.extraKnownMarketplaces = settings.extraKnownMarketplaces || {};
-settings.extraKnownMarketplaces[marketplaceKey] = {
-  source: {
-    source: 'github',
-    repo: 'jazzsequence/claude-skill-nextjs-scaffold',
-  },
-  autoUpdate: true,
-};
-
-fs.writeFileSync(settingsPath, JSON.stringify(settings, null, 2) + '\n');
-EOF
 
 echo -e "${GREEN}✓${NC} Marketplace registered: $MARKETPLACE_KEY"
 
-# Step 2: Install the plugin via the Claude CLI so it's tracked and updatable
-echo "Installing plugin..."
-claude plugin install "$PLUGIN_KEY" 2>&1
+# Step 2: Install the plugin so it's tracked and updatable
+if claude plugin list 2>/dev/null | grep -q "$PLUGIN_KEY"; then
+  echo -e "${YELLOW}Plugin already installed.${NC} Updating..."
+  claude plugin update "$PLUGIN_KEY" 2>&1
+else
+  echo "Installing plugin..."
+  claude plugin install "$PLUGIN_KEY" 2>&1
+fi
 
+echo -e "${GREEN}✓${NC} Plugin installed: $PLUGIN_KEY"
 echo ""
 echo "Start a new Claude Code session to use /scaffold-cpub-nextjs"
-echo "To update later: claude plugin update jazzsequence-skills@cpub-nextjs-scaffold"
+echo "To update later: claude plugin update $PLUGIN_KEY"
